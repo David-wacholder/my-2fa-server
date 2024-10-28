@@ -3,31 +3,31 @@ const bodyParser = require("body-parser");
 const speakeasy = require("speakeasy");
 
 const app = express();
-const PORT = 3000; // פורט לשימוש מקומי בלבד
+const PORT = 3000; // Port for local use only
 
-
-// שימוש ב-body-parser כדי לטפל בבקשות JSON
+// Use body-parser to handle JSON requests
 app.use(bodyParser.json());
 
-// יצירת קוד 2FA
+// Generate 2FA code
 app.post("/api/2fa", (req, res) => {
   const { secret, apiKey } = req.body;
 
-  // יצירת קוד 2FA בעזרת speakeasy
   try {
+    // Generate 2FA code using speakeasy
     const token = speakeasy.totp({
       secret: secret,
       encoding: "base32",
+      time: Math.floor(Date.now() / 1000 / 30) // Ensures it uses UTC time in 30-second intervals
     });
 
-    // שליחת תגובה בפורמט מותאם אישית
-    res.status(200).send(`id_list_message=t-הקוד הוא!.d-${token}`);
+    // Send a customized response
+    res.status(200).send(`id_list_message=t-The code is!.d-${token}`);
   } catch (error) {
-    res.status(500).json({ error: "שגיאה ביצירת קוד 2FA" });
+    res.status(500).json({ error: "Error generating 2FA code" });
   }
 });
 
-// הפעלת השרת מקומית
+// Run the server locally
 app.listen(PORT, () => {
-  console.log(`שרת רץ בכתובת http://localhost:${PORT}`);
+  console.log(`Server is running at http://localhost:${PORT}`);
 });
